@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 760" width="980" height="760"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+    </marker>
+    <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b45309"/>
+    </marker>
+    <style>
+      .bg   { fill:#fbfaf8; }
+      .box  { fill:#ffffff; stroke:#d4d4d8; stroke-width:1.5; rx:6; }
+      .warn { fill:#fffbeb; stroke:#f59e0b; stroke-width:1.5; rx:6; }
+      .out  { fill:#f0f9f4; stroke:#34a06a; stroke-width:1.5; rx:6; }
+      .dec  { fill:#f4f4f5; stroke:#a1a1aa; stroke-width:1.5; }
+      .ghost{ fill:#fafafa; stroke:#c4c4c8; stroke-width:1.4; stroke-dasharray:5 4; rx:6; }
+      .t    { font-size:13px; fill:#1f2328; }
+      .b    { font-size:13px; fill:#1f2328; font-weight:650; }
+      .s    { font-size:11px; fill:#6b7280; }
+      .sw   { font-size:11px; fill:#b45309; }
+      .lbl  { font-size:11px; fill:#6b7280; font-weight:600; }
+      .edge { stroke:#6b7280; stroke-width:1.5; fill:none; marker-end:url(#a); }
+      .edgw { stroke:#b45309; stroke-width:1.5; fill:none; marker-end:url(#aw); }
+      .ttl  { font-size:15px; fill:#1f2328; font-weight:700; }
+      .cap  { font-size:11px; fill:#9ca3af; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="980" height="760"/>
+  <text class="ttl" x="28" y="34">O&amp;M handover pack — how a folder of PDFs becomes a gap report</text>
+  <text class="cap" x="28" y="54">Every box is a function in `handover/`. Nothing leaves the machine.</text>
+
+  <!-- input -->
+  <rect class="box" x="28" y="82" width="190" height="52"/>
+  <text class="b" x="44" y="104">A folder of PDFs</text>
+  <text class="s" x="44" y="122">register · certificates · scans</text>
+  <path class="edge" d="M123,134 L123,166"/>
+
+  <!-- read -->
+  <rect class="box" x="28" y="168" width="190" height="62"/>
+  <text class="b" x="44" y="190">read_pdf</text>
+  <text class="s" x="44" y="208">pdfplumber: text + tables</text>
+  <text class="s" x="44" y="223">never raises on a bad file</text>
+  <path class="edge" d="M123,230 L123,262"/>
+
+  <!-- decision: text layer -->
+  <path class="dec" d="M123,264 L243,312 L123,360 L3,312 Z"/>
+  <text class="b" x="123" y="307" text-anchor="middle">text layer?</text>
+  <text class="s" x="123" y="325" text-anchor="middle">≥ 40 chars</text>
+
+  <!-- no -> ocr -->
+  <path class="edgw" d="M243,312 L300,312"/>
+  <text class="lbl" x="258" y="304">no</text>
+  <rect class="ghost" x="302" y="282" width="186" height="62"/>
+  <text class="b" x="316" y="304">ocr_pdf</text>
+  <text class="s" x="316" y="322">optional import</text>
+  <text class="sw" x="316" y="337">not installed here</text>
+
+  <!-- ocr fails -> unreadable -->
+  <path class="edgw" d="M395,344 L395,392"/>
+  <text class="lbl" x="403" y="372">still nothing</text>
+  <rect class="warn" x="302" y="394" width="300" height="86"/>
+  <text class="b" x="316" y="416">UNREADABLE — surfaced, never dropped</text>
+  <text class="s" x="316" y="436">A document nobody read is not a document</text>
+  <text class="s" x="316" y="451">that is not needed.</text>
+  <text class="sw" x="316" y="470">cross-referenced against the gaps below ↓</text>
+
+  <!-- yes -> register? -->
+  <path class="edge" d="M123,360 L123,396"/>
+  <text class="lbl" x="131" y="382">yes</text>
+  <path class="dec" d="M123,398 L231,440 L123,482 L15,440 Z"/>
+  <text class="b" x="123" y="437" text-anchor="middle">is_register?</text>
+  <text class="s" x="123" y="453" text-anchor="middle">headers or title</text>
+
+  <!-- register branch -->
+  <path class="edge" d="M123,482 L123,520"/>
+  <text class="lbl" x="131" y="506">yes</text>
+  <rect class="box" x="28" y="522" width="212" height="88"/>
+  <text class="b" x="44" y="544">parse_register → Assets</text>
+  <text class="s" x="44" y="563">tag normalised: AHU 01 → AHU-01</text>
+  <text class="s" x="44" y="578">'TBC' rejected as a placeholder</text>
+  <text class="s" x="44" y="593">discipline inferred from prefix</text>
+
+  <!-- document branch -->
+  <path class="edge" d="M231,440 L284,440 L284,506 L796,506 L796,520"/>
+  <text class="lbl" x="240" y="432">no</text>
+  <rect class="box" x="640" y="168" width="312" height="104"/>
+  <text class="b" x="656" y="190">The join that everything depends on</text>
+  <text class="s" x="656" y="210">A certificate and a register row are the same</text>
+  <text class="s" x="656" y="225">asset only if their tags normalise to one key.</text>
+  <text class="s" x="656" y="240">Get this wrong and the report invents a missing</text>
+  <text class="s" x="656" y="255">certificate that is sitting in the folder — and</text>
+  <text class="s" x="656" y="268">one false line discredits every true one.</text>
+
+  <rect class="box" x="640" y="522" width="312" height="88"/>
+  <text class="b" x="656" y="544">classify_document → Documents</text>
+  <text class="s" x="656" y="563">type from its own wording</text>
+  <text class="s" x="656" y="578">commissioning checked before test:</text>
+  <text class="s" x="656" y="593">a commissioning record says 'test' too</text>
+
+  <!-- gaps -->
+  <path class="edge" d="M134,610 L134,648"/>
+  <path class="edge" d="M796,610 L796,648"/>
+  <rect class="box" x="302" y="632" width="376" height="76"/>
+  <text class="b" x="318" y="654">find_gaps</text>
+  <text class="s" x="318" y="674">REQUIRED[discipline] − documents present for that tag</text>
+  <text class="s" x="318" y="692">electrical needs a test cert; mechanical needs commissioning</text>
+  <path class="edge" d="M134,648 L302,665"/>
+  <path class="edge" d="M796,648 L678,665"/>
+
+  <!-- report -->
+  <rect class="out" x="302" y="718" width="376" height="34"/>
+  <text class="b" x="318" y="740">Report — missing · orphans · unreadable</text>
+  <path class="edge" d="M490,708 L490,716"/>
+
+  <!-- confidence sidebar -->
+  <rect class="box" x="640" y="296" width="312" height="140"/>
+  <text class="b" x="656" y="318">Confidence never upgrades itself</text>
+  <text class="s" x="656" y="340">certain — parsed by a rule</text>
+  <text class="s" x="656" y="356">inferred — derived, e.g. discipline from a prefix</text>
+  <text class="s" x="656" y="372">unverified — failed or skipped its checks</text>
+  <text class="s" x="656" y="396">A wrong value stated confidently is worse than</text>
+  <text class="s" x="656" y="411">an admitted gap. The report exists to be trusted</text>
+  <text class="s" x="656" y="426">about absence.</text>
+
+  <!-- llm boundary -->
+  <rect class="ghost" x="640" y="446" width="312" height="46"/>
+  <text class="b" x="656" y="467">LLM — residue only, not built yet</text>
+  <text class="s" x="656" y="484">same schema validation; enters as unverified</text>
+</svg>

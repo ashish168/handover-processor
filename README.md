@@ -36,6 +36,10 @@ DOCUMENTS FOR PLANT NOT IN THE REGISTER
   35-commissioning-certificate-ch-01.pdf           refers to CH-01
 ```
 
+## Architecture
+
+![Architecture](docs/architecture.svg)
+
 ## Run it
 
 ```bash
