@@ -38,6 +38,16 @@ DOCUMENTS FOR PLANT NOT IN THE REGISTER
   35-commissioning-certificate-ch-01.pdf           refers to CH-01
 ```
 
+## The report, as something you can send
+
+`--html` writes a single self-contained file — no assets, no CDN, no
+JavaScript. It opens from disk, survives being emailed as an attachment, and
+prints. [`samples/report.html`](samples/report.html) is the output for the
+sample pack.
+
+The terminal output is for the person running it; this is for the project
+manager who has to act on it.
+
 ## Architecture
 
 ![Architecture](docs/architecture.svg)
@@ -49,6 +59,8 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python samples/generate.py              # build the sample pack
 .venv/bin/python -m handover.cli samples/pack     # the report
 .venv/bin/python -m handover.cli samples/pack --json report.json
+.venv/bin/python -m handover.cli samples/pack --html report.html \
+    --title "Northgate House - Level 3 Refurbishment"
 .venv/bin/python -m pytest tests/ -q
 ```
 
@@ -132,6 +144,10 @@ otherwise declares missing.
 
 Every push generates the pack, runs 26 tests, and prints the gap report into
 the build log. The run is the evidence.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
 
 ## Not a compliance tool
 

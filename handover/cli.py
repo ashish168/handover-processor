@@ -12,6 +12,7 @@ import logging
 import sys
 from pathlib import Path
 
+from .html import render_html
 from .model import REQUIRED, Report
 from .pipeline import process
 
@@ -125,6 +126,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="O&M handover pack gap report")
     ap.add_argument("folder", help="folder of handover PDFs")
     ap.add_argument("--json", metavar="PATH", help="also write the report as JSON")
+    ap.add_argument("--html", metavar="PATH", help="also write the report as a single HTML file")
+    ap.add_argument("--title", default="O&M handover pack", help="project name shown on the report")
     ap.add_argument("-v", "--verbose", action="store_true")
     args = ap.parse_args(argv)
 
@@ -139,6 +142,9 @@ def main(argv=None) -> int:
     if args.json:
         Path(args.json).write_text(json.dumps(as_dict(report), indent=2))
         print(f"\nJSON written to {args.json}")
+    if args.html:
+        Path(args.html).write_text(render_html(report, args.title))
+        print(f"HTML written to {args.html}")
     return 0
 
 

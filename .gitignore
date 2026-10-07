@@ -3,4 +3,5 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 samples/pack/
-*.json
+report.json
+report.html
