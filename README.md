@@ -119,11 +119,12 @@ defined in code and the end-to-end test can assert against them exactly.
 
 Seeded faults: assets with no certificates at all, a certificate for plant that
 was never in the register, `TBC` serial numbers, the same tag written four ways,
-and a scan with no text layer.
+and two image-only scans — one of which contains a certificate the report
+otherwise declares missing.
 
 ## CI
 
-Every push generates the pack, runs 24 tests, and prints the gap report into
+Every push generates the pack, runs 26 tests, and prints the gap report into
 the build log. The run is the evidence.
 
 ## Not a compliance tool
