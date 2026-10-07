@@ -67,9 +67,27 @@ tag prefix — and marked `inferred`, never `certain`.
 ## How it reads a document
 
 Text layer first; OCR only when there isn't one. OCRing a clean PDF is a way to
-introduce errors into text that was already perfect. A file nothing can be read
-from is **listed as unreadable**, never silently dropped — a document nobody
-read is not a document that isn't needed.
+introduce errors into text that was already perfect.
+
+A file nothing can be read from is **listed as unreadable**, never silently
+dropped, and cross-referenced against the gaps — because the sharpest failure
+this tool could have is announcing that an asset has no commissioning
+certificate while that certificate sits in the folder as a photograph:
+
+```
+UNREADABLE — may be hiding the gaps above
+────────────────────────────────────────────────────────────────────────
+  36-scan-fcu-03.pdf
+      ⚠ filename suggests FCU-03, which is reported
+        above as missing: commissioning certificate, warranty
+        Read this file before chasing anyone.
+  37-scan-cws-01.pdf
+      · filename suggests CWS-01, which is not in the register at all
+```
+
+The filename is a hint, not a fact, and is reported as one. The two sample
+scans are deliberately different cases: one hides a gap the report is already
+complaining about, the other is plant nobody recorded anywhere.
 
 OCR is an optional import. The pipeline runs without it, and says so.
 

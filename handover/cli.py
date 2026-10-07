@@ -65,10 +65,22 @@ def render(r: Report) -> str:
         out.append("")
 
     if r.unreadable:
-        out.append(rule("UNREADABLE"))
-        out.append("No text layer, and OCR produced nothing. Needs a human.\n")
+        gap_tags = {g.asset.tag: g for g in r.gaps if g.missing_docs}
+        out.append(rule("UNREADABLE — may be hiding the gaps above"))
+        out.append("No text layer, and OCR produced nothing. A document nobody")
+        out.append("read is not a document that is not needed.\n")
         for name in r.unreadable:
             out.append(f"  {name}")
+            for tag in r.unreadable_hints.get(name, []):
+                if tag in gap_tags:
+                    missing = ", ".join(LABEL.get(d.value, d.value)
+                                        for d in gap_tags[tag].missing_docs)
+                    out.append(f"      ⚠ filename suggests {tag}, which is reported")
+                    out.append(f"        above as missing: {missing}")
+                    out.append(f"        Read this file before chasing anyone.")
+                elif tag not in {a.tag for a in r.assets}:
+                    out.append(f"      · filename suggests {tag}, which is not in "
+                               f"the register at all")
         out.append("")
 
     out.append(rule())

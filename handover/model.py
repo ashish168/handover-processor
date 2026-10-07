@@ -119,6 +119,11 @@ class Report:
     gaps: list[AssetGap]
     orphan_docs: list[Document]      # reference a tag not in the register
     unreadable: list[str]            # files nothing could be read from
+    # Unreadable file -> tags it probably covers, taken from its filename.
+    # An unreadable document is not just a nuisance: it may be the very
+    # certificate the report is calling missing, and saying so turns a
+    # complaint into the next action.
+    unreadable_hints: dict[str, list[str]] = field(default_factory=dict)
 
     @property
     def complete_assets(self) -> int:

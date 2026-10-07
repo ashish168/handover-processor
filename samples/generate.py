@@ -9,7 +9,8 @@ Seeded faults:
   * a certificate naming an asset that was never in the register
   * serial numbers left as 'TBC'
   * the same asset tag written four different ways across documents
-  * a document with no readable text layer (a scan)
+  * two image-only scans, one of which is a certificate the report
+    otherwise declares missing
 """
 
 from __future__ import annotations
@@ -124,6 +125,51 @@ def cert(kind: str, tag: str, body: list[str], idx: int, issued: str):
     build(f"{idx:02d}-{slug}-{tag.lower()}.pdf", story)
 
 
+def scanned_certificate(idx: int, tag: str, title: str, body: list[str], note: str):
+    """A certificate that exists only as pixels.
+
+    Real packs are full of these: someone photographed a signed sheet and
+    dropped the image in. There is content, but no text layer, so a text-only
+    reader must say so rather than quietly treat the file as empty.
+    """
+    from io import BytesIO
+
+    from PIL import Image, ImageDraw, ImageFont
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas
+
+    W, H = 1240, 1754                       # A4 at 150 dpi
+    img = Image.new("RGB", (W, H), (249, 247, 242))
+    d = ImageDraw.Draw(img)
+
+    big = ImageFont.load_default(size=40)
+    mid = ImageFont.load_default(size=26)
+    small = ImageFont.load_default(size=22)
+
+    y = 110
+    d.text((110, y), title, fill=(26, 26, 30), font=big); y += 70
+    d.text((110, y), PROJECT.replace("—", "-"), fill=(60, 60, 66), font=mid); y += 46
+    d.text((110, y), f"Asset reference: {tag}", fill=(26, 26, 30), font=mid); y += 70
+    for line in body:
+        d.text((110, y), line, fill=(40, 40, 46), font=small); y += 40
+    y += 40
+    d.text((110, y), "Date of Issue: 09/09/2026", fill=(40, 40, 46), font=small); y += 60
+    d.text((110, y), "Signed: ..............................", fill=(40, 40, 46), font=small)
+    d.text((110, H - 160), note, fill=(120, 120, 126), font=small)
+
+    img = img.rotate(-0.6, expand=False, fillcolor=(249, 247, 242))   # never square on the glass
+
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+
+    OUT.mkdir(parents=True, exist_ok=True)
+    c = canvas.Canvas(str(OUT / f"{idx:02d}-scan-{tag.lower()}.pdf"), pagesize=A4)
+    c.drawImage(ImageReader(buf), 0, 0, width=A4[0], height=A4[1])
+    c.showPage()
+    c.save()
+
+
 def main():
     random.seed(7)
     for f in OUT.glob("*.pdf"):
@@ -173,9 +219,34 @@ def main():
         "Serial No|CC200-77310", "Location|Roof plant", "Result|Pass",
     ], i, "11/08/2026"); i += 1
 
-    # A document with no text layer, standing in for a phone photo of a cert.
-    story = [Spacer(1, 60 * mm), Paragraph(" ", STYLES["Normal"])]
-    build(f"{i:02d}-scanned-cert-illegible.pdf", story)
+    # Two scans, chosen to show two different consequences of the same defect.
+    #
+    # FCU-03: the report says this asset has NO commissioning certificate. It
+    # does - this is it. Because the file is pixels, the tool cannot see it,
+    # and a gap report that quietly ignored unreadable files would state a
+    # falsehood with total confidence. This is why they are listed.
+    scanned_certificate(
+        i, "FCU-03", "COMMISSIONING CERTIFICATE",
+        ["Plant item: Fan coil unit, meeting rooms",
+         "Make: Thermaline        Model No: TL-080",
+         "Serial No: TL080-9983",
+         "Location: Level 3 ceiling void",
+         "Measured air volume: within tolerance",
+         "Result: Pass"],
+        "Scanned document - no text layer. OCR required.")
+    i += 1
+
+    # CWS-01: plant that is not in the register either. Unreadable AND
+    # unregistered, so nothing in the pack knows this tank exists.
+    scanned_certificate(
+        i, "CWS-01", "COMMISSIONING CERTIFICATE",
+        ["Plant item: Cold water storage tank, 2000L",
+         "Make: Aquaterm        Model No: AQ-CWS-2000",
+         "Serial No: AQCWS-11827",
+         "Location: Roof tank room",
+         "Chlorination: completed to BS 8558",
+         "Result: Pass"],
+        "Scanned document - no text layer. OCR required.")
 
     print(f"wrote {len(list(OUT.glob('*.pdf')))} files to {OUT}")
 

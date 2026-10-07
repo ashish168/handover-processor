@@ -69,10 +69,38 @@ def test_certificate_for_unregistered_plant_is_flagged(report):
     assert "ch-01" in report.orphan_docs[0].path
 
 
-def test_unreadable_scan_is_listed_not_silently_dropped(report):
-    """Without OCR installed this file yields nothing. The failure must be
-    visible: a document nobody read is not a document that isn't needed."""
-    assert any("illegible" in n for n in report.unreadable)
+def test_unreadable_scans_are_listed_not_silently_dropped(report):
+    """Both scans are image-only. Without OCR they yield nothing, and that
+    failure must be visible: a document nobody read is not a document that
+    isn't needed."""
+    assert len(report.unreadable) == 2
+    assert any("fcu-03" in n for n in report.unreadable)
+    assert any("cws-01" in n for n in report.unreadable)
+
+
+def test_unreadable_file_is_linked_to_the_gap_it_may_close(report):
+    """The sharpest failure this tool can have: reporting that FCU-03 has no
+    commissioning certificate while that certificate sits in the folder as an
+    image. The report must connect the two rather than state the gap flatly."""
+    hint_file = next(n for n in report.unreadable if "fcu-03" in n)
+    assert "FCU-03" in report.unreadable_hints[hint_file]
+
+    gap = next(g for g in report.gaps if g.asset.tag == "FCU-03")
+    assert DocType.COMMISSIONING_CERT in gap.missing_docs, (
+        "the gap is real given what is readable - the point is that the "
+        "unreadable file is flagged as possibly closing it")
+
+    from handover.cli import render
+    text = render(report)
+    assert "Read this file before chasing anyone" in text
+
+
+def test_unreadable_file_for_unregistered_plant_says_so(report):
+    """CWS-01 is unreadable AND absent from the register, which is a different
+    problem from a scan that merely hides a known gap."""
+    hint_file = next(n for n in report.unreadable if "cws-01" in n)
+    assert "CWS-01" in report.unreadable_hints[hint_file]
+    assert "CWS-01" not in {a.tag for a in report.assets}
 
 
 def test_discipline_drives_which_documents_are_required(report):

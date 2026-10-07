@@ -151,7 +151,14 @@ def process(folder: str | Path) -> Report:
     gaps = find_gaps(assets, documents)
     orphans = [d for d in documents
                if d.asset_tags and not any(t in by_tag for t in d.asset_tags)]
-    return Report(assets, documents, gaps, orphans, unreadable)
+
+    # A file we could not read still has a name, and handover files are almost
+    # always named after the plant they cover. That is a hint, not a fact, so
+    # it is reported as one.
+    hints = {name: find_tags(name) for name in unreadable}
+    hints = {k: v for k, v in hints.items() if v}
+
+    return Report(assets, documents, gaps, orphans, unreadable, hints)
 
 
 def find_gaps(assets: list[Asset], documents: list[Document]) -> list[AssetGap]:
