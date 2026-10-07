@@ -1,5 +1,7 @@
 # O&M handover pack — gap report
 
+[![ci](https://github.com/ashish168/handover-processor/actions/workflows/ci.yml/badge.svg)](https://github.com/ashish168/handover-processor/actions/workflows/ci.yml)
+
 Reads a folder of building-services handover documents and reports what is
 **missing**, which is the part nobody can do by eye.
 
